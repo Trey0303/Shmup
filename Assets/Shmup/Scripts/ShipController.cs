@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class ShipController : MonoBehaviour
 {
-    public float speed = 5;
+    public float speed = 5f;
+    public float autoSpeed = 5.0f;
 
     public GameObject bulletPrefab;
 
@@ -56,7 +57,7 @@ public class ShipController : MonoBehaviour
 
         Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0.0f, Input.GetAxis("Vertical"));
         //deltaTime makes ship move by 5 seconds instead of 5 frames
-        transform.Translate(input * speed * Time.deltaTime);
+        transform.Translate(((input * speed) + Vector3.forward * autoSpeed) * Time.deltaTime);
 
         if (firingTimer <= 0.0f && Input.GetButton("shmupFire"))
         {
@@ -65,5 +66,15 @@ public class ShipController : MonoBehaviour
             firingTimer = firingInterval;
 
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Bullet bullet = collision.gameObject.GetComponent<Bullet>();
+        if(bullet != null)
+        {
+            return;
+        }
+        TakeDamage(1);
     }
 }

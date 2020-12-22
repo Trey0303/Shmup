@@ -14,6 +14,9 @@ public class Alien : MonoBehaviour
     public float firingInterval = 1.0f;
     private float firingTimer;
 
+    public float detectRadius = 8f;
+    private bool playerDetected = false;
+
     private void Start()
     {
         playerReference = GameObject.FindGameObjectWithTag("Player");
@@ -25,9 +28,11 @@ public class Alien : MonoBehaviour
         firingTimer -= Time.deltaTime;
 
 
-        if(playerReference != null)
+        if(playerDetected && playerReference != null)
         {
             Vector3 dirToPlayer = (playerReference.transform.position - transform.position).normalized;
+
+
 
             if(firingTimer <= 0.0f)
             {
@@ -41,6 +46,14 @@ public class Alien : MonoBehaviour
 
             transform.forward = dirToPlayer;
             transform.position += dirToPlayer * speed * Time.deltaTime;
+        }
+        else if(!playerDetected && playerReference != null)
+        {  
+            float disToPlayer = (transform.position - playerReference.transform.position).magnitude;
+            if(disToPlayer <= detectRadius)
+            {
+                playerDetected = true;
+            }
         }
 
     }
@@ -71,5 +84,10 @@ public class Alien : MonoBehaviour
         {
             ship.TakeDamage(1);
         }
+    }
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, detectRadius);
     }
 }
